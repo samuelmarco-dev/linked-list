@@ -40,6 +40,7 @@ int isLinkedListEmpty(list *l);
 
 int reduceList(list *l);
 int highestValue(list *l);
+void insertElementAscendingOrder(list *l, int value);
 
 stack *newStack();
 void push(stack *s, int value);
@@ -78,14 +79,73 @@ int main() {
 
     sum = reduceList(l);
     high = highestValue(l);
-    printf("\nA soma dos no(s) é %d\nO maior valor encontrado foi %d\n\n", sum, high);
+    printf("\nThe sum of nodes in the list is: %d\nThe highest value found in the list was: %d\n\n", sum, high);
 
     stack *s = newStack();
     invertList(l, s);
 
+    printf("\n");
+    list *inOrder = newLinkedList();
+    insertElementAscendingOrder(inOrder, 5);
+    insertElementAscendingOrder(inOrder, 2);
+    insertElementAscendingOrder(inOrder, 4);
+    insertElementAscendingOrder(inOrder, 9);
+    insertElementAscendingOrder(inOrder, 1);
+    insertElementAscendingOrder(inOrder, 20);
+    showList(inOrder);
+
+    printf("\n");
+    list *aux = newLinkedList();
+    for(i=0; i<NUMBER; i++) {
+        insertElementInList(aux, rand() % LIMIT, i);
+    }
+    showList(aux);
+    sortList(aux);
+
     return 0;
 }
 
+void insertElementAscendingOrder(list *l, int value) {
+    node *n = newNode(value);
+    node *previous = l->first;
+    node *aux;
+
+    if(isLinkedListEmpty(l) || previous->info >= value) {
+        insertElementAtStart(l, n);
+    }
+    else {
+        while(previous != NULL && previous->info <= value) {
+            aux = previous->next;
+            if(aux == NULL || aux->info > value) break;
+            else previous = previous->next;
+        }
+        n->next = previous->next;
+        previous->next = n;
+    }
+}
+
+void sortList(list *l) {
+    node *n = l->first;
+    list *listAux = newLinkedList();
+
+    if(isLinkedListEmpty(l)) {
+        printf("Unable to sort an empty list!\n");
+        return;
+    }
+
+    while(n != NULL){
+        insertElementAscendingOrder(listAux, n->info);
+        n = n->next;
+    }
+
+    l->first = listAux->first;
+    listAux->first = NULL;
+    free(listAux);
+
+    showList(l);
+}
+
+//variação: reduceList(node *n);
 int reduceList(list *l) {
     node *n = l->first;
     int sum = 0;
@@ -314,79 +374,3 @@ int pop(stack *s) {
 int isStackEmpty(stack *s) {
     return s->top == NULL;
 }
-
-/*
-void insertElementAscendingOrder(list *l, int value) {
-    node *n = newNode(value);
-    node *previous = l->first;
-    node *limit;
-
-    if(isLinkedListEmpty(l)) {
-        insertElementAtStart(l, n);
-        return;
-    }
-
-    if(previous->info >= value) {
-        n->next = previous;
-        l->first = n;
-    } else {
-        limit = limitValue(l, value);
-        n->next = limit->next;
-        limit->next = n;
-    }
-}
-
-node *limitValue(list *l, int value) {
-    node *n = l->first;
-
-    if(isLinkedListEmpty(l)) {
-        printf("Cannot find the value in an empty list!\n");
-        exit(1);
-    }
-
-    while(n != NULL) {
-        if(n->info >= value && value < n->next->info) return n;
-        n = n->next;
-    }
-
-    return n;
-}
-*/
-
-/*
-void insertElementAscendingOrder(list *l, int value) {
-    node *n = newNode(value);
-    node *previous = l->first;
-    node *limit;
-
-    if(isLinkedListEmpty(l)) {
-        insertElementAtStart(l, n);
-        return;
-    }
-
-    if(previous->info >= value) {
-        n->next = previous;
-        l->first = n;
-    } else {
-        limit = limitValue(l, value);
-        n->next = limit->next;
-        limit->next = n;
-    }
-}
-
-node *limitValue(list *l, int value) {
-    node *n = l->first;
-
-    if(isLinkedListEmpty(l)) {
-        printf("Cannot find the value in an empty list!\n");
-        exit(1);
-    }
-
-    while(n != NULL) {
-        if(n->info >= value && value < n->next->info) return n;
-        n = n->next;
-    }
-
-    return n;
-}
-*/
