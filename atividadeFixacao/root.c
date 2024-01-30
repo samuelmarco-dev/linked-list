@@ -17,10 +17,6 @@ typedef struct {
     node *first;
 } list;
 
-typedef struct {
-    node *top;
-} stack;
-
 list *newLinkedList();
 node *newNode(int value);
 
@@ -38,24 +34,12 @@ int lengthOfList(list *l);
 int isIndexInvalidInList(list *l, int index);
 int isLinkedListEmpty(list *l);
 
-int reduceList(list *l);
-int highestValue(list *l);
-void insertElementAscendingOrder(list *l, int value);
-
-stack *newStack();
-void push(stack *s, int value);
-int pop(stack *s);
-int isStackEmpty(stack *s);
-
-void invertList(list *l, stack *s);
-void sortList(list *l);
-
 int main() {
     setlocale(LC_ALL, "");
     srand(time(NULL));
 
     list *l = newLinkedList();
-    int i, indexOf, sum, high;
+    int i, indexOf;
     int value = 1;
 
     for(i=0; i<NUMBER; i++) {
@@ -77,129 +61,7 @@ int main() {
     printf("\nLength: %d\n", lengthOfList(l));
     showList(l);
 
-    sum = reduceList(l);
-    high = highestValue(l);
-    printf("\nThe sum of nodes in the list is: %d\nThe highest value found in the list was: %d\n\n", sum, high);
-
-    stack *s = newStack();
-    invertList(l, s);
-
-    printf("\n");
-    list *inOrder = newLinkedList();
-    insertElementAscendingOrder(inOrder, 5);
-    insertElementAscendingOrder(inOrder, 2);
-    insertElementAscendingOrder(inOrder, 4);
-    insertElementAscendingOrder(inOrder, 9);
-    insertElementAscendingOrder(inOrder, 1);
-    insertElementAscendingOrder(inOrder, 20);
-    showList(inOrder);
-
-    printf("\n");
-    list *aux = newLinkedList();
-    for(i=0; i<NUMBER; i++) {
-        insertElementInList(aux, rand() % LIMIT, i);
-    }
-    showList(aux);
-    sortList(aux);
-
     return 0;
-}
-
-void insertElementAscendingOrder(list *l, int value) {
-    node *n = newNode(value);
-    node *previous = l->first;
-    node *aux;
-
-    if(isLinkedListEmpty(l) || previous->info >= value) {
-        insertElementAtStart(l, n);
-    }
-    else {
-        while(previous != NULL && previous->info <= value) {
-            aux = previous->next;
-            if(aux == NULL || aux->info > value) break;
-            else previous = previous->next;
-        }
-        n->next = previous->next;
-        previous->next = n;
-    }
-}
-
-void sortList(list *l) {
-    node *n = l->first;
-    list *listAux = newLinkedList();
-
-    if(isLinkedListEmpty(l)) {
-        printf("Unable to sort an empty list!\n");
-        return;
-    }
-
-    while(n != NULL){
-        insertElementAscendingOrder(listAux, n->info);
-        n = n->next;
-    }
-
-    l->first = listAux->first;
-    listAux->first = NULL;
-    free(listAux);
-
-    showList(l);
-}
-
-//variação: reduceList(node *n);
-int reduceList(list *l) {
-    node *n = l->first;
-    int sum = 0;
-
-    if(isLinkedListEmpty(l)) return sum;
-
-    while(n != NULL) {
-        sum += n->info;
-        n = n->next;
-    }
-
-    return sum;
-}
-
-int highestValue(list *l) {
-    node *n = l->first;
-    int high = n->info;
-
-    if(isLinkedListEmpty(l)) {
-        printf("Cannot find the largest value in an empty list!\n");
-        exit(1);
-    }
-
-    while(n != NULL) {
-        if(n->info > high) high = n->info;
-        n = n->next;
-    }
-
-    return high;
-}
-
-void invertList(list *l, stack *s) {
-    node *n = l->first;
-    int i, remove;
-    node *element;
-
-    if(isLinkedListEmpty(l)) {
-        printf("Cannot invert an empty list!\n");
-        return;
-    }
-
-    for(i=0; i<lengthOfList(l); i++) {
-        element = searchElementByIndex(l, i);
-        push(s, element->info);
-    }
-
-    if(!isStackEmpty(s)) {
-        printf("Linked list invert:\n-> ");
-    }
-    while(!isStackEmpty(s)) {
-        remove = pop(s);
-        printf("%d ", remove);
-    }
-    printf("\n");
 }
 
 list *newLinkedList() {
@@ -340,37 +202,4 @@ int isIndexInvalidInList(list *l, int index) {
 
 int isLinkedListEmpty(list *l) {
     return l->first == NULL;
-}
-
-stack *newStack() {
-    stack *s = (stack *)malloc(sizeof(stack));
-    s->top = NULL;
-
-    return s;
-}
-
-void push(stack *s, int value) {
-    node *n = newNode(value);
-    n->next = s->top;
-    s->top = n;
-}
-
-int pop(stack *s) {
-    node *n = s->top;
-    int aux;
-
-    if(isStackEmpty(s)) {
-        printf("The stack is currently empty. Try again!\n"); //Stack Underflow
-        exit(1);
-    }
-
-    aux = n->info;
-    s->top = n->next;
-    free(n);
-
-    return aux;
-}
-
-int isStackEmpty(stack *s) {
-    return s->top == NULL;
 }
